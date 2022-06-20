@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --watch dev -e js dev/api.js"
+    "node_1": "nodemon --watch dev -e js dev/networkNode.js 3000 http://localhost:3000",
+    "node_2": "nodemon --watch dev -e js dev/networkNode.js 3001 http://localhost:3001",
+    "node_3": "nodemon --watch dev -e js dev/networkNode.js 3002 http://localhost:3002"
   },
   "author": "Vinaykumar Prajapati",
   "license": "ISC",
@@ -13,6 +15,8 @@
     "body-parser": "^1.20.0",
     "express": "^4.18.1",
     "nodemon": "^2.0.16",
-    "sha256": "^0.2.0"
+    "request-promise": "^4.2.6",
+    "sha256": "^0.2.0",
+    "uuid": "^8.3.2"
   }
 }
