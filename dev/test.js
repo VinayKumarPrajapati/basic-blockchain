@@ -1,30 +1,36 @@
 const Blockchain = require('./blockchain');
 const bitcoin = new Blockchain();
 
-const previousBlockHash = 'VINAY0NKI7878NHJJHJHDE';
+console.log(bitcoin);
 
-const currentBlockData = [
-    {
-        amount: 10,
-        sender: 'VINAY0NKI7878NHJJHJHDE',
-        recipient: '0IHUU324J899M87',
-    },
-    {
-        amount: 190,
-        sender: 'AINAY0NKI7878NHJJHJHDE',
-        recipient: '0AHUU324J899M87',
-    },
-    {
-        amount: 410,
-        sender: 'BINAY0NKI7878NHJJHJHDE',
-        recipient: '0BHUU324J899M87',
-    },
+// const previousBlockHash = 'VINAY0NKI7878NHJJHJHDE';
 
-];
+// const currentBlockData = [
+//     {
+//         amount: 10,
+//         sender: 'VINAY0NKI7878NHJJHJHDE',
+//         recipient: '0IHUU324J899M87',
+//     },
+//     {
+//         amount: 190,
+//         sender: 'AINAY0NKI7878NHJJHJHDE',
+//         recipient: '0AHUU324J899M87',
+//     },
+//     {
+//         amount: 410,
+//         sender: 'BINAY0NKI7878NHJJHJHDE',
+//         recipient: '0BHUU324J899M87',
+//     },
+
+// ];
+
+
+
+
 /* Return nonces it took to find blockhash that start with 4 zeros */
 // console.log(bitcoin.proofOfWork(previousBlockHash, currentBlockData));
 
-console.log(bitcoin.hashBlock(previousBlockHash,currentBlockData, 36332));
+// console.log(bitcoin.hashBlock(previousBlockHash,currentBlockData, 36332));
 
 // bitcoin.createNewBlock(91098, '0IHUUBJ899M87','0NKI7878NHJJHJH');
 
