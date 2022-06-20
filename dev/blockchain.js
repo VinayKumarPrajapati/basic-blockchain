@@ -1,5 +1,7 @@
 const sha256 = require('sha256');
 const currentNodeUrl = process.argv[3];
+const { v4: uuidv4 } = require('uuid');
+uuidv4();
 
 function Blockchain() {
     this.chain = [];
@@ -38,15 +40,18 @@ Blockchain.prototype.createNewTransaction = function(amount, sender, recipient){
     const newTransaction = {
         amount: amount,
         sender: sender,
-        recipient: recipient
+        recipient: recipient,
+        transcationId: uuidv4().split('-').join('')
     };
     //Everytime new Transcation Created it will push newTransaction[] 
     //This are pending Transactions 
     //Validated after creating new block
-    this.pendingTransactions.push(newTransaction);
-
-    return this.getLastBlock()['index'] + 1;
+    return newTransaction;
 }
+Blockchain.prototype.addTransactionToPendingTranscations = function(TransactionObj){
+    this.pendingTransactions.push(TransactionObj);
+    return this.getLastBlock()['index'] + 1; 
+};
     // return hash generated from the block we passed
     //sha256 input as text and return fix length of hash string
 Blockchain.prototype.hashBlock = function(previousBlockHash, currentBlockData, nonce){
