@@ -19,7 +19,7 @@ Blockchain.prototype.createNewBlock = function(nonce, previousBlockHash, hash) {
     const newBlock = {
         index: this.chain.length + 1,
         timestamp: Date.now(),
-        transcations: this.pendingTransactions,
+        transactions: this.pendingTransactions,
         nonce: nonce,
         hash: hash,
         previousBlockHash: previousBlockHash
@@ -41,14 +41,14 @@ Blockchain.prototype.createNewTransaction = function(amount, sender, recipient){
         amount: amount,
         sender: sender,
         recipient: recipient,
-        transcationId: uuidv4().split('-').join('')
+        transactionId: uuidv4().split('-').join('')
     };
     //Everytime new Transcation Created it will push newTransaction[] 
     //This are pending Transactions 
     //Validated after creating new block
     return newTransaction;
 }
-Blockchain.prototype.addTransactionToPendingTranscations = function(TransactionObj){
+Blockchain.prototype.addTransactionToPendingTransactions  = function(TransactionObj){
     this.pendingTransactions.push(TransactionObj);
     return this.getLastBlock()['index'] + 1; 
 };
@@ -84,8 +84,7 @@ Blockchain.prototype.chainIsValid = function(blockchain) {
     for(var i = 1; i < blockchain.length; i++){
         const currentBlock = blockchain[i];
         const prevBlock = blockchain[i - 1];
-        const blockHash = this.hashBlock(prevBlock['hash'], { transcations: currentBlock['transactions'], index: currentBlock['index'], nonce: currentBlock['nonce'] });
-
+        const blockHash = this.hashBlock(prevBlock['hash'], { transactions: currentBlock['transactions'], index: currentBlock['index'] }, currentBlock['nonce']);
         if(blockHash.substring(0,4) !== '0000') 
             validChain = false;
 
@@ -133,7 +132,7 @@ Blockchain.prototype.getTransaction = function(transactionId){
     return {
         transaction: correctTransaction,
         block: correctBlock
-    }
+    };
 };
 
 Blockchain.prototype.getAddressData = function(address){
@@ -141,7 +140,7 @@ Blockchain.prototype.getAddressData = function(address){
     const addressTransactions = []; 
     this.chain.forEach(block =>{
         block.transaction.forEach(transaction =>{
-            if(transaction.sender === address || transaction.recipient == address){
+            if(transaction.sender === address || transaction.recipient === address){
                 addressTransactions.push(transaction); 
             }
         });
@@ -161,7 +160,7 @@ Blockchain.prototype.getAddressData = function(address){
     return {
         addressTransactions: addressTransactions,
         addressBalance: balance
-    }
+    };  
 
 };
 

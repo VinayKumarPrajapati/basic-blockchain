@@ -6,8 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 uuidv4();
 const port = process.argv[2];
 const rp = require('request-promise');
-const { post } = require('request-promise');
-const { request } = require('express');
+
 
 const nodeAddress = uuidv4().split('-').join('');
 
@@ -21,16 +20,16 @@ app.get('/blockchain', function(req, res) {
 });
 
 //Whenever need to create transaction it will call transaction/broadcast
-app.post('/transcation', function(req, res) {
+app.post('/transaction', function(req, res) {
     const newTransaction = req.body;
-    const blockIndex = bitcoin.addTransactionToPendingTranscations(newTransaction);
-    res.json({note: `Transaction will be added in block ${blockIndex}`})
+    const blockIndex = bitcoin.addTransactionToPendingTransactions(newTransaction);
+    res.json({note: `Transaction will be added in block ${blockIndex}`});
 });
 
 app.post('/transaction/broadcast', function(req, res){
 
     const newTransaction = bitcoin.createNewTransaction(req.body.amount, req.body.sender, req.body.recipient);
-    bitcoin.addTransactionToPendingTranscations(newTransaction);
+    bitcoin.addTransactionToPendingTransactions(newTransaction);
 
     const requestPromises = [];
     bitcoin.networkNodes.forEach(networkNodeUrl => {
@@ -58,11 +57,10 @@ app.get('/mine', function(req, res) {
     };
 
     const nonce = bitcoin.proofOfWork(previousBlockHash, currentBlockData);
-
     const blockHash = bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce);
 
     //Giving Bitcon to miner
-    bitcoin.createNewTransaction(12.5, "00",nodeAddress);
+  //  bitcoin.createNewTransaction(12.5, "00",nodeAddress);
 
     const newBlock = bitcoin.createNewBlock(nonce, previousBlockHash, blockHash);
 
@@ -71,39 +69,57 @@ app.get('/mine', function(req, res) {
         const requestOptions = {
             uri: networkNodeUrl + '/receive-new-block',
             method: 'POST',
-            body: { newBlock : newBlock },
+            body: { newBlock: newBlock },
             json: true
         };
        requestPromises.push(rp(requestOptions));
     });
 
     Promise.all(requestPromises)
-        .then(data => {
-            const requestOptions = {
-                uri: bitcoin.currentNodeUrl + '/transaction/broadcast',
-                method: 'POST',
-                body: {
-                    amount: 12.5,
-                    sender: "00",
-                    recipient: nodeAddress
-                },
-                json: true
-            };
-            
-            return rp(requestOptions); 
-        })
-        .then(data => {
-            res.json({
-                note: "New Block mined successfully",
-                block: newBlock
-            })
-        });
+	.then(data => {
+		const requestOptions = {
+			uri: bitcoin.currentNodeUrl + '/transaction/broadcast',
+			method: 'POST',
+			body: {
+				amount: 12.5,
+				sender: "00",
+				recipient: nodeAddress
+			},
+			json: true
+		};
 
-    res.json({
-        note: "New Block Mined Successfully",
-        block: newBlock
-    })
+		return rp(requestOptions);
+	})
+	.then(data => {
+		res.json({
+			note: "New block mined & broadcast successfully",
+			block: newBlock
+		});
+	});
 });
+
+//receive new block
+app.post('/receive-new-block', function(req, res) {
+	const newBlock = req.body.newBlock;
+	const lastBlock = bitcoin.getLastBlock();
+	const correctHash = lastBlock.hash === newBlock.previousBlockHash; 
+	const correctIndex = lastBlock['index'] + 1 === newBlock['index'];
+
+	if (correctHash && correctIndex) {
+		bitcoin.chain.push(newBlock);
+		bitcoin.pendingTransactions = [];
+		res.json({
+			note: 'New block received and accepted.',
+			newBlock: newBlock
+		});
+	} else {
+		res.json({
+			note: 'New block rejected.',
+			newBlock: newBlock
+		});
+	}
+});
+
 
 //Register node, broadcast node to entire network
 app.post('/register-and-broadcast-node',function(req,res){
@@ -219,7 +235,7 @@ app.get('/consensus', function(req, res) {
                 });
             }
 
-            else if(newLongestChain && bitcoin.chainIsValid(newLongestChain)){
+            else{
 
                 bitcoin.chain = newLongestChain;
                 bitcoin.pendingTransactions = newPendingTransactions;
