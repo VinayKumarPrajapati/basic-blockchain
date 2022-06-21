@@ -84,7 +84,7 @@ Blockchain.prototype.chainIsValid = function(blockchain) {
     for(var i = 1; i < blockchain.length; i++){
         const currentBlock = blockchain[i];
         const prevBlock = blockchain[i - 1];
-        const blockHash = this.hashBlock(prevBlock['hash'], { transcations: currentBlock['transactions'], index: currentBlock['index'], currentBlock['nonce'] });
+        const blockHash = this.hashBlock(prevBlock['hash'], { transcations: currentBlock['transactions'], index: currentBlock['index'], nonce: currentBlock['nonce'] });
 
         if(blockHash.substring(0,4) !== '0000') 
             validChain = false;
@@ -103,6 +103,37 @@ Blockchain.prototype.chainIsValid = function(blockchain) {
         validChain = false;
 
     return validChain;
+};
+
+Blockchain.prototype.getBlock = function(blockHash){
+
+    let correctBlock = null;
+
+    this.chain.forEach(block => {
+        if(block.hash === blockHash) correctBlock = block;
+    });
+
+    return correctBlock;
+};
+
+Blockchain.prototype.getTransaction = function(transactionId){
+
+    let correctTransaction = null;
+    let correctBlock = null;
+
+    this.chain.forEach(block => {
+        block.transactions.forEach(transaction => {
+            if(transaction.transactionId === transactionId){
+                correctTransaction = transaction;
+                correctBlock = block;
+            };
+        });
+    });
+
+    return {
+        transaction: correctTransaction,
+        block: correctBlock
+    }
 };
 
 module.exports = Blockchain;
