@@ -244,10 +244,30 @@ app.get('/block/:blockHash', function(req, res){
 
 app.get('/transaction/:transactionId', function(req, res){
 
+    const transactionId = req.params.transactionId;
+    const transactionData = bitcoin.getTransaction(transactionId);
+
+    res.json({
+        transaction: transactionData.transaction,
+        block: transactionData.block
+    })
+
 });
 
 app.get('/address/:address', function(req, res){
 
+    const address = req.params.address;
+    const addressData = bitcoin.getAddressData(address);
+    res.json({
+        addressData: addressData
+    });
+
+});
+
+app.get('/block-explorer', function(req, res){
+    res.sendFile('./blockExploreFrontend/index.html', {
+        root: __dirname
+    })
 });
 
 
